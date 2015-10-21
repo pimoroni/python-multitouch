@@ -203,7 +203,7 @@ class Touchscreen(object):
             except IOError as e:
                 if e.errno != errno.ENOENT:
                     raise
-            raise RuntimeError('Unable to locate touchscreen device')
+        raise RuntimeError('Unable to locate touchscreen device')
 
     def read(self):
         return next(iter(self))
