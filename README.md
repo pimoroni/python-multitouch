@@ -6,6 +6,10 @@ Multi-touch pure Python driver for the official 7" touchscreen display.
 
 This is a work in progress, but lets you use all 10 points of multitouch on the official 7" Pi Touchscreen in Python.
 
+Note: It will only work with any sort of sanity in fullscreen mode currently
+
+To exit examples, you must currently hit ESC and then tap the screen.
+
 # Installing
 
 Navigate into the library folder, and run setup like so:
