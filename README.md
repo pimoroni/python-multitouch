@@ -24,9 +24,8 @@ import ft5406
 ts = ft5406.Touchscreen()
 
 while True:
-  for touches in ts.poll():
-    for touch in touches:
-      print(touch.slot, touch.id, touch.valid, touch.x, touch.y)
+    for touch in ts.poll():
+        print(touch.slot, touch.id, touch.valid, touch.x, touch.y)
 ```
 
 The `slot` is a number from 0 to 9, denoting which index the touch is at.
