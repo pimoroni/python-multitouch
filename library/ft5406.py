@@ -67,10 +67,11 @@ class Touchscreen(object):
             yield TouchEvent(tv_sec + (tv_usec / 1000000), type, code, value)
 
     def poll(self):
-        for event in self.__iter__():
+        while True:
+            event = self.read()
+
             if event.type == EV_SYN: # Sync
-                yield self.touches
-                break
+                return self.touches
                 
             if event.type == EV_ABS: # Absolute cursor position
                 if event.code == ABS_MT_SLOT:

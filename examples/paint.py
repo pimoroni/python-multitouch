@@ -32,16 +32,15 @@ state = [False for x in range(10)]
 position = [(0,0) for x in range(10)]
 
 while True:
-    for touches in ts.poll():
-        for touch in touches:
-            position[touch.slot] = (touch.x, touch.y)
-            if state[touch.slot] != touch.valid:
-                if touch.valid:
-                    print("{} pressed!".format(touch.slot))
-                    start[touch.slot] = (touch.x, touch.y)
-                else:
-                    print("{} released!".format(touch.slot))
-                state[touch.slot] = touch.valid
+    for touch in ts.poll():
+        position[touch.slot] = (touch.x, touch.y)
+        if state[touch.slot] != touch.valid:
+            if touch.valid:
+                print("{} pressed!".format(touch.slot))
+                start[touch.slot] = (touch.x, touch.y)
+            else:
+                print("{} released!".format(touch.slot))
+            state[touch.slot] = touch.valid
 
     for event in pygame.event.get():
         if event.type == KEYDOWN:
