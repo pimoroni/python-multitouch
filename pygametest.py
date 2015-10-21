@@ -1,0 +1,46 @@
+import sys
+import pygame
+import time
+import os
+from pygame.locals import *
+import touchie
+
+pygame.init()
+
+size = width, height = 800, 480
+screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
+
+pygame.mouse.set_visible(False)
+
+ts = touchie.Touchscreen()
+
+start = [(0, 0) for x in range(10)]
+state = [False for x in range(10)]
+position = [(0,0) for x in range(10)]
+
+while True:
+    for touches in ts.poll():
+        for touch in touches:
+            position[touch.slot] = (touch.x, touch.y)
+            if state[touch.slot] != touch.valid:
+                if touch.valid:
+                    print("{} pressed!".format(touch.slot))
+                    start[touch.slot] = (touch.x, touch.y)
+                else:
+                    print("{} released!".format(touch.slot))
+                state[touch.slot] = touch.valid
+
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                sys.exit()
+
+    screen.fill((0, 0, 0))
+
+    for x in range(10):
+        if state[x]:
+            pygame.draw.line(screen, (0, 0, 255), start[x], position[x])
+
+    pygame.display.flip()
+
+    time.sleep(0.001)
