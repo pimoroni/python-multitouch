@@ -3,7 +3,7 @@ import pygame
 import time
 import os
 from pygame.locals import *
-import touchie
+import ft5406
 
 pygame.init()
 
@@ -12,7 +12,7 @@ screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 
 pygame.mouse.set_visible(False)
 
-ts = touchie.Touchscreen()
+ts = ft5406.Touchscreen()
 
 start = [(0, 0) for x in range(10)]
 state = [False for x in range(10)]
