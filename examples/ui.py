@@ -22,20 +22,28 @@ buttons = []
 
 class Button:
 
-    def __init__(self, color, x, y, w, h, action):
+    def __init__(self, label, color, position, size, action):
         global buttons
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
+        self.x, self.y = position
+        self.w, self.h = size
+
+        self.label = label
+
         self.active = True
         self.action = action
         buttons.append(self)
         self.color =  color
         self.thickness = 2
 
+        self.font = pygame.font.Font(None, 30)
+
     def render(self, screen):
-        pygame.draw.rect(screen, (255, 0, 0), (self.position, self.size), 2)
+        pygame.draw.rect(screen, self.color, (self.position, self.size), 2)
+        text = self.font.render(self.label, 1, self.color)
+        textpos = text.get_rect()
+        textpos.centerx = self.x + (self.w/2)
+        textpos.centery = self.y + (self.h/2)
+        screen.blit(text, textpos)
 
     def collide(self, event, touch):
         if self.active:
@@ -69,17 +77,10 @@ def on_press(event, touch):
     for button in buttons:
         button.collide(event, touch)
 
-    pass
-
 def on_release(event, touch):
     pass
 
 def on_move(event, touch):
-    #pygame.draw.line(
-    #    screen,
-    #    col[touch.slot],
-    #    touch.last_position,
-    #    touch.position)
     pass
 
 ts = ft5406.Touchscreen()
@@ -89,11 +90,26 @@ for touch in ts.touches:
     touch.on_release = on_release
     touch.on_move = on_move
 
-my_button = Button((255, 0, 0), 20, 20, 200, 50, 
+Button(
+    "Quack!",
+    (255, 0, 0),
+    (20, 20),
+    (200, 60), 
     lambda e,t: print("Quack!",t.slot))
 
-py_arr = Button((0,255,0), 20, 80, 200, 50, 
+Button(
+    "Duck!",
+    (0,255,0), 
+    (20, 100),
+    (200, 60), 
     lambda e,t: print("Duck!",t.slot))
+
+Button(
+    "Moo!",
+    (0, 0, 255),
+    (20, 180),
+    (200, 60),
+    lambda e,t: print("Moo!",t.slot))
 
 ts.run()
 
