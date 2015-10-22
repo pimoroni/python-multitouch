@@ -3,6 +3,7 @@ import pygame
 import time
 import os
 import math
+from numpy import interp
 from pygame.locals import *
 from ft5406 import TS_PRESS, TS_RELEASE, TS_MOVE
 
@@ -193,12 +194,12 @@ class Dial(Widget):
 class Slider(Widget):
 
     def __init__(self, min_max, color, position, size, on_change):
-        self.min_val, self.max_val = (min_max)
+        self.min_val, self.max_val, self.default_val = (min_max)
         self.color = color
 
         self._value_changed = on_change
         
-        self.value = 0
+        self.value = interp(self.default_val, [self.min_val, self.max_val], [0, 1])
 
         super(Slider, self).__init__(position, size)
 
@@ -219,7 +220,11 @@ class Slider(Widget):
         elif self.h > self.w: # Vertical Slider
             if y >= 0 and y <= self.h:
                 self.value = float(y)/float(self.h)
- 
+
+        if callable(self._value_changed):
+            new_value = interp(self.value,[0,1],[self.min_val,self.max_val]) 
+            self._value_changed(self, new_value)
+
 
     def render(self, screen):
         thickness = 2
