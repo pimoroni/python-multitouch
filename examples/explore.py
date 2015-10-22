@@ -30,29 +30,41 @@ ts.run()
 
 left = 0
 
-for x in range(len(explorerhat.light)):
-    light = explorerhat.light[x]
+def setup_light(idx, light):
     Button(
         light.name,
         [(0, 0, 255),(255, 255, 0),(255, 0, 0),(0, 255, 0)][x],
         (10 + left, 10),
         (100, 100),
-        lambda b,e,t: explorerhat.light[b.label].toggle())
+        lambda b,e,t: light.toggle())
+    
+    Slider(
+        (0,100,0),
+        [(0, 0, 255),(255, 255, 0),(255, 0, 0),(0, 255, 0)][x],
+        (10 + left, 120),
+        (100, 350),
+        lambda s,v: light.brightness(v))
+
+        
+for x in range(len(explorerhat.light)):
+    light = explorerhat.light[x]
+    setup_light(x, light)
     left += 110
 
-Slider(
-    (-100,100,0),
-    (255,255,255),
-    (10,120),
-    (50, 300),
-    lambda s, v:explorerhat.motor.one.speed(v))
 
 Slider(
     (-100,100,0),
     (255,255,255),
-    (70,120),
-    (50,300),
-    lambda s, v:explorerhat.motor.two.speed(v))
+    (450,10),
+    (50, 460),
+    lambda s, v:explorerhat.motor.one.speed(int(v)))
+
+Slider(
+    (-100,100,0),
+    (255,255,255),
+    (510,10),
+    (50,460),
+    lambda s, v:explorerhat.motor.two.speed(int(v)))
 
 Button(
     "X",
