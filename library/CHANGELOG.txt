@@ -1,0 +1,7 @@
+#0.0.2
+
+* Improved event handling to be non-blocking
+
+#0.0.1
+
+* Initial prototype

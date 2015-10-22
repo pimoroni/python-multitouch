@@ -4,6 +4,7 @@ import time
 import os
 from pygame.locals import *
 import ft5406
+from gui import text
 
 pygame.init()
 
@@ -51,6 +52,8 @@ while True:
         if state[x]:
             pygame.draw.line(screen, col[x], start[x], position[x])
             start[x] = position[x]
+
+    text(screen, "Hit ESC to exit!", (400, 460), 30, (255, 0, 0))  
 
     pygame.display.flip()
 
