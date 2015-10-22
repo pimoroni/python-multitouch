@@ -4,8 +4,8 @@ import time
 import os
 import math
 from pygame.locals import *
-from ft5406 import Touchscreen, TS_PRESS, TS_RELEASE, TS_MOVE
-from gui import widgets, Button, Slider, Dial, fullscreen_message
+from ft5406 import Touchscreen
+from gui import widgets, Button, Slider, Dial, render_widgets, touchscreen_event
 
 pygame.init()
 
@@ -14,20 +14,19 @@ screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 
 pygame.mouse.set_visible(False)
 
-def on_event(event, touch):
-    for widget in widgets:
-        widget.event(event, touch)
-
 ts = Touchscreen()
 
 for touch in ts.touches:
-    touch.on_press = on_event
-    touch.on_release = on_event
-    touch.on_move = on_event
+    touch.on_press = touchscreen_event
+    touch.on_release = touchscreen_event
+    touch.on_move = touchscreen_event
 
 def button_event(b, e, t):
     print(b.label)
 
+def my_exit(b, e, t):
+    global running
+    running = False
 
 Dial(
     (0, 100),
@@ -64,6 +63,13 @@ Button(
     (160, 60),
     button_event)
 
+Button(
+    "x",
+    (255, 0, 0),
+    (760, 0),
+    (40, 40),
+    my_exit)
+
 for x in range(6):
     Slider(
         (0,100),
@@ -81,19 +87,19 @@ Slider(
 
 ts.run()
 
-while True:
+running = True
+while running:
     for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                pygame.display.flip()
-                ts.stop()
-                sys.exit()
+        if event.type == KEYDOWN and event.key == K_ESCAPE:
+            ts.stop()
+            sys.exit()
 
     screen.fill((0, 0, 0))
 
-    for widget in widgets:
-        widget.render(screen)
+    render_widgets(screen)
 
     pygame.display.flip()
 
     time.sleep(0.01)
+
+ts.stop()

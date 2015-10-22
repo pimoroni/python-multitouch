@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "Installing FT5406 Library"
+cd library/
+sudo python3 setup.py install
+echo "Installing GUI Library"
+cd ../gui/
+sudo python3 setup.py install

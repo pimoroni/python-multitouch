@@ -9,7 +9,7 @@ import re
 import sys
 from pygame.locals import *
 from ft5406 import Touchscreen, TS_PRESS
-from gui import Button, render_widgets, touch_widgets
+from gui import Button, render_widgets, touchscreen_event
 
 BANK = os.path.join(os.path.dirname(__file__), "sounds")
 
@@ -87,7 +87,7 @@ def button_event(button, event, touch):
         samples[channel].play(loops=0)
 
 def on_ts_event(event, touch):
-    touch_widgets(event, touch)
+    touchscreen_event(event, touch)
 
 
 ts = Touchscreen()

@@ -5,7 +5,8 @@ import os
 import math
 from pygame.locals import *
 from ft5406 import Touchscreen, TS_PRESS, TS_RELEASE, TS_MOVE
-from gui import Widget, Dial, touch_widgets, render_widgets, fullscreen_message
+from gui import Widget, Button, Dial, touchscreen_event, render_widgets
+
 ship = [None,None]
 
 class Ship(Widget):
@@ -68,15 +69,16 @@ screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 
 pygame.mouse.set_visible(False)
 
-def on_event(event, touch):
-    touch_widgets(event, touch)
-
 ts = Touchscreen()
 
 for touch in ts.touches:
-    touch.on_press = on_event
-    touch.on_release = on_event
-    touch.on_move = on_event
+    touch.on_press = touchscreen_event
+    touch.on_release = touchscreen_event
+    touch.on_move = touchscreen_event
+
+def stop(b, e, t):
+    global running
+    running = False
 
 def update_ship_velocity(ship_idx, angle, velocity):
     global ship
@@ -105,18 +107,26 @@ Dial(
     80,
     lambda v, a: update_ship_velocity(1, v, a))
 
+Button(
+    "X",
+    (255, 0, 0),
+    (760, 0),
+    (40, 40),
+    stop)
+
 ship = [
     Ship((255, 0, 255),(400, 240),(0, 0)),
     Ship((255, 255, 0),(400, 250),(0, 0))]
 
 ts.run()
 
-while True:
+running = True
+
+while running:
     for event in pygame.event.get():
-        if event.type == KEYDOWN:
-            if event.key == K_ESCAPE:
-                ts.stop()
-                sys.exit()
+        if event.type == KEYDOWN and event.key == K_ESCAPE:
+            ts.stop()
+            sys.exit()
 
     for s in ship:
         s.update()
@@ -128,3 +138,5 @@ while True:
     pygame.display.flip()
 
     time.sleep(0.01)
+
+ts.stop()

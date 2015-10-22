@@ -9,7 +9,7 @@ from ft5406 import TS_PRESS, TS_RELEASE, TS_MOVE
 widgets = []
 
 
-def touch_widgets(event, touch):
+def touchscreen_event(event, touch):
     """Update all widgets with a specific touch event"""
     for widget in widgets:
         widget.event(event, touch)
