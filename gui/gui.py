@@ -37,8 +37,14 @@ def text(screen, text, position, size, color):
 
 class Widget:
     
-    def __init__(self, position, size):
+    def __init__(self, position=None, size=None):
         global widgets
+
+        if position is None:
+            raise ValueError("Missing required argument position")
+
+        if size is None:
+            raise ValueError("Missing required argument size")
 
         try:
             callable(self.on_press)
@@ -118,7 +124,17 @@ class Widget:
 
 class Dial(Widget):
     
-    def __init__(self, min_max, color, position, radius, on_change):
+    def __init__(self, min_max=None, color=None, position=None, radius=None, on_change=None):
+
+        if min_max is None:
+            raise ValueError("Missing required argument: min_max")
+        
+        if color is None:
+            color = (255, 0, 0)
+
+        if radius is None:
+            raise ValueError("Missing required argument: radius")
+
         self.min_val, self.max_val = (min_max)
         self.color = color
         self.radius = radius
@@ -128,7 +144,7 @@ class Dial(Widget):
 
         self.value = 0
 
-        super(Dial, self).__init__(position, (radius, radius))
+        super(Dial, self).__init__(position, (radius*2, radius*2))
 
     def on_release(self, event, touch):
         self.distance = 0
@@ -193,7 +209,14 @@ class Dial(Widget):
 
 class Slider(Widget):
 
-    def __init__(self, min_max, color, position, size, on_change):
+    def __init__(self, min_max=None, color=None, position=None, size=None, on_change=None):
+
+        if min_max is None:
+            raise ValueError("Missing required argument: min_max")
+
+        if color is None:
+            color = (255, 0, 0)
+
         self.min_val, self.max_val, self.default_val = (min_max)
         self.color = color
 
@@ -255,8 +278,14 @@ class Slider(Widget):
 
 class Button(Widget):
 
-    def __init__(self, label, color, position, size, action):
+    def __init__(self, label=None, color=None, position=None, size=None, action=None):
         super(Button, self).__init__(position, size)
+
+        if label is None:
+            label = ""
+
+        if color is None:
+            color = (255, 0, 0)
 
         self.label = label
 
