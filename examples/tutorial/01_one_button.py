@@ -22,11 +22,11 @@ def button_event(b, e, t):
     print("{} pressed!".format(b.label))
 
 Button(
-    "My Button",
-    (255, 0, 0),
-    (300, 190),
-    (200, 100), 
-    button_event)
+    label="My Button",
+    color=(255, 0, 0),
+    position=(300, 190),
+    size=(200, 100), 
+    action=button_event)
 
 ts.run()
 
