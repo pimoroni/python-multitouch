@@ -96,7 +96,6 @@ class Keyboard(tk.Frame):
         self.parent.title("MultiKey")
         self.ww = 800
         self.wh = 315
-        self.wh = 37
 
         self.sw = self.parent.winfo_screenwidth()
         self.sh = self.parent.winfo_screenheight()
@@ -136,7 +135,7 @@ class Keyboard(tk.Frame):
             self.key_release(x, y)
 
     def _draw_ui(self):
-        bg = ImageTk.PhotoImage(Image.open("keyboard.gif"))
+        bg = ImageTk.PhotoImage(Image.open("/usr/share/multikey/keyboard.gif"))
         panel = tk.Label(self.window, image=bg)
         panel.image = bg
         panel.pack()
