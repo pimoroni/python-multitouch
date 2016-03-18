@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+
+import tkinter as tk
+from PIL import ImageTk, Image
+import sys
+from evdev import uinput, ecodes as e
+from ft5406 import Touchscreen, TS_PRESS, TS_RELEASE, TS_MOVE
+
+class Key():
+    def __init__(self, x, y, w, h, keycode):
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.x2 = x+w
+        self.y2 = y+h
+        self.keycode = keycode
+
+class Keymap():
+    def __init__(self):
+        self.keys = []
+        
+        o_left = 0
+        o_top = 0
+        k_w = 56
+        k_h = 53
+
+
+        for key in [e.KEY_ESC, e.KEY_F1, e.KEY_F2, e.KEY_F3, e.KEY_F4, e.KEY_F5, e.KEY_F6, e.KEY_F7, e.KEY_F8, e.KEY_F9, e.KEY_F10, e.KEY_F11, e.KEY_F12, 'activate']:
+            self.keys.append(Key(o_left, o_top, k_w, 37, key))
+            o_left += k_w
+
+        o_top += 37
+        o_left = 0
+
+        for key in [e.KEY_RESERVED, e.KEY_1, e.KEY_2, e.KEY_3, e.KEY_4, e.KEY_5, e.KEY_6, e.KEY_7, e.KEY_8, e.KEY_9, e.KEY_0, e.KEY_MINUS, e.KEY_EQUAL]:
+            self.keys.append(Key(o_left, o_top, k_w, k_h, key))
+            o_left += k_w
+
+        self.keys.append(Key(o_left, o_top, 88, 56, e.KEY_BACKSPACE))
+        o_top += k_h
+       
+        # Tab QWERTYUIOP[] Enter
+        o_left = 87 
+        for key in [e.KEY_Q, e.KEY_W, e.KEY_E, e.KEY_R, e.KEY_T, e.KEY_Y, e.KEY_U, e.KEY_I, e.KEY_O, e.KEY_P, e.KEY_LEFTBRACE, e.KEY_RIGHTBRACE]:
+            self.keys.append(Key(o_left, o_top, k_w, k_h, key))
+            o_left += k_w
+
+        self.keys.append(Key(754, o_top, 46, k_h * 2, e.KEY_ENTER)) 
+
+        # Caps Lock ASDFGHJKL ;'#
+        o_left = 100
+        o_top += k_h
+        for key in [e.KEY_A, e.KEY_S, e.KEY_D, e.KEY_F, e.KEY_G, e.KEY_H, e.KEY_J, e.KEY_K, e.KEY_L, e.KEY_SEMICOLON, e.KEY_APOSTROPHE, e.KEY_BACKSLASH]:
+            self.keys.append(Key(o_left, o_top, k_w, k_h, key))
+            o_left += k_w
+
+        # Shift \ ZXCVBNM,./
+        o_left = 74
+        o_top += k_h
+        for key in [e.KEY_GRAVE, e.KEY_Z, e.KEY_X, e.KEY_C, e.KEY_V, e.KEY_B, e.KEY_N, e.KEY_M, e.KEY_COMMA, e.KEY_DOT, e.KEY_SLASH]:
+            self.keys.append(Key(o_left, o_top, k_w, k_h, key))
+            o_left += k_w
+
+        self.keys.append(Key(0,      o_top, 74,  k_h, e.KEY_LEFTSHIFT))
+        self.keys.append(Key(o_left, o_top, 128, k_h, e.KEY_RIGHTSHIFT))
+
+        o_top += k_h
+
+        self.keys.append(Key(0,              o_top, 59,  66, e.KEY_FN))
+        self.keys.append(Key(59,             o_top, k_w, 66, e.KEY_LEFTCTRL))
+        self.keys.append(Key(59 + k_w,       o_top, k_w, 66, e.KEY_LEFTALT))
+        self.keys.append(Key(59 + k_w + k_w, o_top, 65,  66, e.KEY_OPTION))
+        self.keys.append(Key(236,            o_top, 273, 66, e.KEY_SPACE))
+        self.keys.append(Key(236 + 273,      o_top, 65,  66, e.KEY_OPTION))
+        self.keys.append(Key(236 + 273 + 65, o_top, k_w, 66, e.KEY_RIGHTALT))
+      
+    def release(self, x, y):
+        for key in self.keys:
+            if key.x <= x <= key.x2 and key.y <= y <= key.y2:
+                return key.keycode
+        return  None
+
+    press = release
+
+class Keyboard(tk.Frame):
+    def __init__(self, parent, *args, **kwargs):
+        tk.Frame.__init__(self, parent)
+
+        self.ts = Touchscreen()
+        self.uinput = uinput.UInput()
+        self.keymap = Keymap()
+
+        self.parent = parent
+        self.window = tk.Toplevel()
+        self.parent.title("MultiKey")
+        self.ww = 800
+        self.wh = 315
+        self.wh = 37
+
+        self.sw = self.parent.winfo_screenwidth()
+        self.sh = self.parent.winfo_screenheight()
+
+        self.wx = 0
+        self.wy = self.sh - self.wh
+
+        self.window.overrideredirect(True)
+        self.window.resizable(width=False, height=False)
+        self.window.attributes("-topmost", 1)
+        self.window.config(cursor="none")
+
+        self.window.wait_visibility(self.window)
+        self.window.attributes("-alpha", 0.1)
+
+        self.set_geometry(self.ww, self.wh, self.wx, self.wy)
+
+        self.parent.bind('<Escape>',self.evt_close)
+
+        self._draw_ui()
+
+        for touch in self.ts.touches:
+            touch.on_press = self._touch_handler
+            touch.on_release = self._touch_handler
+            touch.on_move = self._touch_handler
+
+    def _touch_handler(self, event, touch):
+        x, y = touch.position
+        #print("Got touch at {x}x{y}".format(x=x,y=y))
+        x -= self.wx
+        y -= self.wy
+        #print("Remapped to {x}x{y}".format(x=x,y=y))
+
+        if event == TS_PRESS:
+            self.key_press(x, y)
+        if event == TS_RELEASE:
+            self.key_release(x, y)
+
+    def _draw_ui(self):
+        bg = ImageTk.PhotoImage(Image.open("keyboard.gif"))
+        panel = tk.Label(self.window, image=bg)
+        panel.image = bg
+        panel.pack()
+
+    def set_geometry(self, ww, wh, wx, wy):
+        self.window.geometry('{ww}x{wh}+{wx}+{wy}'.format(ww=ww,wh=wh,wx=wx,wy=wy))
+
+    def evt_close(self, event):
+        self.ts.stop()
+        self.uinput.close()
+        self.window.withdraw()
+        sys.exit()
+        
+    def key_press(self, x, y):
+        keycode = self.keymap.press(x, y)
+        if keycode == 'activate':
+            if self.wh == 315:
+                self.wx = 0
+                self.wy = self.sh - 37
+                self.ww = self.sw
+                self.wh = 37
+                self.set_geometry(self.ww, self.wh, self.wx, self.wy)
+            else:
+                self.wx = 0
+                self.wy = self.sh - 315
+                self.ww = self.sw
+                self.wh = 315
+                self.set_geometry(self.ww, self.wh, self.wx, self.wy)
+            return
+        if keycode is not None:
+            self.uinput.write(e.EV_KEY, keycode, 1)
+            self.uinput.syn()
+
+    def key_release(self, x, y):
+        keycode = self.keymap.release(x, y)
+        if keycode == 'activate':
+            return
+        if keycode is not None:
+            self.uinput.write(e.EV_KEY, keycode, 0)
+            self.uinput.syn()
+
+    def __del__(self):
+        self.ts.stop()
+        self.uinput.close()
+
+    def run(self):
+        self.ts.run()
+        self.pack()
+        self.parent.mainloop()
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    Keyboard(root).run()
