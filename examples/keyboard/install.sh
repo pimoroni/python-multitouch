@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt-get install python3-pil python3-pil.imagetk
+sudo pip3 install evdev
 sudo groupadd uinput
 sudo usermod -a -G uinput pi
 sudo cp 98-keyboard.rules /etc/udev/rules.d/ 
