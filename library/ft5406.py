@@ -116,7 +116,8 @@ class Touchscreen(object):
     EVENT_FORMAT = str('llHHi')
     EVENT_SIZE = struct.calcsize(EVENT_FORMAT)
 
-    def __init__(self):
+    def __init__(self, device=None):
+        self._device = self.TOUCHSCREEN_EVDEV_NAME if device is None else device
         self._running = False
         self._thread = None
         self._f_poll = select.poll()
@@ -216,12 +217,12 @@ class Touchscreen(object):
         for evdev in glob.glob("/sys/class/input/event*"):
             try:
                 with io.open(os.path.join(evdev, 'device', 'name'), 'r') as f:
-                    if f.read().strip() == self.TOUCHSCREEN_EVDEV_NAME:
+                    if f.read().strip() == self._device:
                         return os.path.join('/dev','input',os.path.basename(evdev))
             except IOError as e:
                 if e.errno != errno.ENOENT:
                     raise
-        raise RuntimeError('Unable to locate touchscreen device')
+        raise RuntimeError('Unable to locate touchscreen device: {}'.format(self._device))
 
     def read(self):
         return next(iter(self))
