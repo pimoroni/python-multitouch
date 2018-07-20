@@ -45,5 +45,5 @@ setup(name		= 'ft5406',
 	keywords	= 'Raspberry Pi Explorer HAT',
 	url		= 'http://shop.pimoroni.com',
 	classifiers     = classifiers,
-	py_modules	= ['ft5406'],
+	py_modules	= ['ft5406', 'hp4ts'],
 )
