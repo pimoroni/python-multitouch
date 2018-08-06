@@ -5,7 +5,10 @@ import os
 import math
 from numpy import interp
 from pygame.locals import *
-from ft5406 import TS_PRESS, TS_RELEASE, TS_MOVE
+
+TS_PRESS = 1
+TS_RELEASE = 0
+TS_MOVE = 2
 
 widgets = []
 
